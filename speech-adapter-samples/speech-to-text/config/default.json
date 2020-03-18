@@ -1,12 +1,18 @@
 {
     "Server": {
-        "port": 8020
+        "port": 80
     },
     "WatsonSpeechToText": {
         "credentials": {
             "username": "<username>",
             "password": "<password>"
         }
+    },
+    "SaigenSpeechToText": {
+        "url": "ws://34.242.45.132:80/client/ws/speech",
+        "username": "<username>",
+        "password": "<password>",
+        "port": "80"
     },
     "LogLevel": "debug"
 }

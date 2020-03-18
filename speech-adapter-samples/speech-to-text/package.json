@@ -7,14 +7,16 @@
     "dev": "nodemon ./app.js | pino",
     "start": "node app.js | pino",
     "lint": "eslint .",
-    "test": "eslint . && LOG_LEVEL=error mocha test/"
+    "test": "LOG_LEVEL=debug mocha test/"
   },
   "author": "",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "config": "^1.29.2",
+    "object.pick": "^1.3.0",
     "pino": "^4.10.2",
     "watson-developer-cloud": "^3.0.3",
+    "websocket": "^1.0.31",
     "ws": "^3.3.3"
   },
   "devDependencies": {

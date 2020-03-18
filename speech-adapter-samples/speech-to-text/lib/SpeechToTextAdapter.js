@@ -18,7 +18,8 @@ const WebSocketServer = require('ws').Server;
 
 // Change to your own Speech To Text Engine implementation, you can use
 // the WatsonSpeechToTextEngine.js for guidance
-const SpeechToTextEngine = require('./WatsonSpeechToTextEngine');
+//const SpeechToTextEngine = require('./WatsonSpeechToTextEngine');
+const SpeechToTextEngine = require('./SaigenSpeechToTextEngine');
 const url = require('url');
 const Config = require('config');
 
@@ -34,10 +35,19 @@ function removeActiveSpeechEngine(speechToTextEngine) {
 }
 
 function setActiveSpeechEngine(speechToTextEngine, webSocket) {
-  speechToTextEngine.on('listening', () => {
+/*   speechToTextEngine.on('listening', () => {
     logger.debug('engine is listening');
     const listeningMsg = {
       state: 'listening',
+    };
+    webSocket.send(JSON.stringify(listeningMsg));
+  }); */
+  speechToTextEngine.once('open', () => {
+    //once this is sent, the client will start transmitting the audio
+    logger.debug('STT engine is listening, sending listening to client');
+    const listeningMsg = {
+      state: 'listening',
+      from: 'SpeechToTextAdapter',
     };
     webSocket.send(JSON.stringify(listeningMsg));
   });
@@ -88,7 +98,8 @@ function handleSpeechToTextConnection(webSocket, incomingMessage) {
   logger.debug(`connection with session-id: ${sessionID}`);
   let speechToTextEngine;
   webSocket.on('message', (data) => {
-    logger.trace(data.length, 'received from websocket connection');
+    //logger.debug(data.length, 'received from websocket connection');
+    //console.log(data);
     if (typeof data === 'string') {
       try {
         const message = JSON.parse(data);
@@ -119,7 +130,7 @@ function handleSpeechToTextConnection(webSocket, incomingMessage) {
       }
     } else if (Buffer.isBuffer(data)) {
       if (speechToTextEngine) {
-        logger.trace('writing to engine');
+        //logger.debug('writing to engine');
         speechToTextEngine.write(data);
       }
     } else {

@@ -39,7 +39,7 @@ describe.only('Speech To Text Adapter', function () {
   });
 
   it('should get a final result on audio', function (done) {
-    this.timeout(10000);
+    this.timeout(20000);
     const queryParams = {
       model: 'en-US_NarrowbandModel',
     };
@@ -51,17 +51,21 @@ describe.only('Speech To Text Adapter', function () {
     const realTimeAudioStream = utils.createRealTimeAudioStream('./test/resources/open_the_crate.raw');
     const ws = new WebSocket(url);
     ws.on('open', () => {
+      // note: this is what VGW will send to the STT adapter to open the connection
       const openingMessage = {
         action: 'start',
-        'content-type': 'audio/basic',
+        'content-type': 'audio/x-mulaw',
         interim_results: true,
-        inactivity_timeout: -1,
+       // inactivity_timeout: -1,
         profile: 'low_latency',
       };
+      console.log(`TestClient: Sending Opening message to Adapter ${openingMessage}`);
       ws.send(JSON.stringify(openingMessage));
     });
 
     ws.on('message', (data) => {
+      console.log(`TestClient: Received message`);
+      console.log(data);
       if (typeof data === 'string') {
         const message = JSON.parse(data);
         if (message.state === 'listening') {
@@ -85,6 +89,13 @@ describe.only('Speech To Text Adapter', function () {
           }
         }
       }
+    });
+
+    ws.on('send-json', (data) => {
+      console.log(`TestClient rec data: ${data}`);
+    });
+    ws.on('special', (data) => {
+      console.log(`TestClient rec data special: ${data}`);
     });
 
     ws.on('error', done);
